@@ -59,15 +59,37 @@ angular.module('highcharts-ng', [])
 
       var defaultOptions = {
         chart: {
-          events: {}
+          events: {},
+          marginTop: "25"
+        },
+        credits: {
+          enabled: false
         },
         title: {},
-        subtitle: {},
+        legend: {
+          align:"right",
+          verticalAlign:"top",
+          floating:true,
+          borderColor:"#FFF",
+          y:"-50"
+        },
+        plotOptions: {
+          series: {
+            marker: {
+              enabled:false
+            },
+            lineWidth:0
+          }
+        },
+        yAxis: {
+          title: {
+            text:"Millones"
+          },
+          gridLineColor:"#EEEEEE"
+        },
         series: [],
-        credits: {},
-        plotOptions: {},
         navigator: {enabled: false}
-      };
+      }
 
       if (config.options) {
         mergedOptions = deepExtend(defaultOptions, config.options);
