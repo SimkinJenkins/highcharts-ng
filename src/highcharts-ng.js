@@ -16,7 +16,6 @@ angular.module('highcharts-ng', [])
       return -1;
     };
 
-
     function prependMethod(obj, method, func) {
       var original = obj[method];
       obj[method] = function () {
@@ -33,6 +32,7 @@ angular.module('highcharts-ng', [])
 
     function deepExtend(destination, source) {
       for (var property in source) {
+        console.log(property);
         if (source[property] && source[property].constructor &&
           source[property].constructor === Object) {
           destination[property] = destination[property] || {};
@@ -56,11 +56,10 @@ angular.module('highcharts-ng', [])
 
     var getMergedOptions = function (scope, element, config) {
       var mergedOptions = {};
-
       var defaultOptions = {
         chart: {
           events: {},
-          marginTop: "25"
+          margin: [25, 50, 40, 5]
         },
         credits: {
           enabled: false
@@ -81,16 +80,23 @@ angular.module('highcharts-ng', [])
             lineWidth:0
           }
         },
+        tooltip: {
+            formatter: function() {
+                return "<span>Edad " + this.x + " años<br/>" +
+                        this.series.name + " " + this.y.toFixed(2) + " millones</span>";
+            }
+        },
         yAxis: {
-          title: {
-            text:"Millones"
+          labels: {
+            formatter: function() {
+                return this.y + "M";
+            }
           },
           gridLineColor:"#EEEEEE"
         },
         series: [],
         navigator: {enabled: false}
       }
-
       if (config.options) {
         mergedOptions = deepExtend(defaultOptions, config.options);
       } else {
@@ -119,8 +125,14 @@ angular.module('highcharts-ng', [])
             scope.config[axisName].currentMin = this[axisName][0].min || scope.config[axisName].currentMin;
             scope.config[axisName].currentMax = this[axisName][0].max || scope.config[axisName].currentMax;
           });
-
           mergedOptions[axisName] = angular.copy(config[axisName]);
+          mergedOptions.yAxis.labels = {
+                                          formatter: function() {
+                                            return this.value + "M";
+                                          },
+                                          align: "left"
+                                      };
+          mergedOptions.yAxis.opposite = true;
         }
       });
 
@@ -195,7 +207,12 @@ angular.module('highcharts-ng', [])
     var initialiseChart = function(scope, element, config) {
       config = config || {};
       var mergedOptions = getMergedOptions(scope, element, config);
+//      mergedOptions.yAxis.labels.x = 910;
       var chart = config.useHighStocks ? new Highcharts.StockChart(mergedOptions) : new Highcharts.Chart(mergedOptions);
+//      console.log(chart.options.yAxis[0].labels.x);
+//      chart.options.yAxis[0].labels.x = chart.chartWidth
+//      console.log(chart.options.yAxis[0].labels.x);
+//      mergedOptions.yAxis.labels.x = chart.chartWidth;
       for (var i = 0; i < axisNames.length; i++) {
         if (config[axisNames[i]]) {
           processExtremes(chart, config[axisNames[i]], axisNames[i]);
@@ -205,6 +222,8 @@ angular.module('highcharts-ng', [])
       if(config.loading) {
         chart.showLoading();
       }
+      console.log(chart.options.yAxis[0].labels.x);
+      console.log("initialiseChart", chart);
       chart.redraw();
       return chart;
     };
