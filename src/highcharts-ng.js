@@ -204,6 +204,7 @@ angular.module('highcharts-ng', [])
 
     };
 
+
     var initialiseChart = function(scope, element, config) {
       config = config || {};
       var mergedOptions = getMergedOptions(scope, element, config);
